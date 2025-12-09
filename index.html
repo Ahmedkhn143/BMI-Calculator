@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMI Calculator</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Three.js Canvas -->
+<canvas id="bg-canvas"></canvas>
+
+<div class="main-container">
+    <div class="card">
+        <div class="card-header text-center">
+            <h3 class="mb-1 fw-bold"><i class="fas fa-heartbeat me-2"></i>BMI Calculator</h3>
+            <p class="mb-0 text-white-50 small">Track your health journey</p>
+        </div>
+        <div class="card-body p-4 p-md-5">
+            
+            <div class="d-flex justify-content-center mb-4 unit-toggle">
+                <div class="btn-group" role="group" aria-label="Unit Toggle">
+                    <input type="radio" class="btn-check" name="unitSystem" id="metric" autocomplete="off" checked onchange="toggleUnits()">
+                    <label class="btn btn-outline-primary" for="metric">Metric (kg/cm)</label>
+
+                    <input type="radio" class="btn-check" name="unitSystem" id="imperial" autocomplete="off" onchange="toggleUnits()">
+                    <label class="btn btn-outline-primary" for="imperial">Imperial (lb/ft)</label>
+                </div>
+            </div>
+
+            <form id="bmiForm" onsubmit="calculateBMI(event)">
+                <div class="mb-4">
+                    <label for="weight" class="form-label">Weight</label>
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-text border-end-0 bg-transparent"><i class="fas fa-weight text-secondary"></i></span>
+                        <input type="number" class="form-control border-start-0 ps-0" id="weight" placeholder="e.g. 70" required step="0.1" min="1">
+                        <span class="input-group-text" id="weightUnit">kg</span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Height</label>
+                    
+                    <div class="input-group input-group-lg" id="heightMetricGroup">
+                        <span class="input-group-text border-end-0 bg-transparent"><i class="fas fa-ruler-vertical text-secondary"></i></span>
+                        <input type="number" class="form-control border-start-0 ps-0" id="heightCm" placeholder="e.g. 175" step="0.1" min="1">
+                        <span class="input-group-text">cm</span>
+                    </div>
+
+                    <div class="input-group input-group-lg d-none" id="heightImperialGroup">
+                        <span class="input-group-text border-end-0 bg-transparent"><i class="fas fa-ruler-vertical text-secondary"></i></span>
+                        <input type="number" class="form-control border-start-0 ps-0" id="heightFt" placeholder="ft" step="1" min="1">
+                        <span class="input-group-text">ft</span>
+                        <input type="number" class="form-control" id="heightIn" placeholder="in" step="1" min="0" max="11">
+                        <span class="input-group-text">in</span>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary btn-calculate text-white shadow-sm">
+                        Calculate BMI
+                    </button>
+                    <button type="button" class="btn btn-link text-decoration-none text-muted" onclick="resetForm()">
+                        Clear & Reset
+                    </button>
+                </div>
+            </form>
+
+            <div id="resultSection" class="text-center">
+                <p class="text-muted mb-1 text-uppercase small fw-bold">Your Result</p>
+                <div class="bmi-value" id="bmiValue">0.0</div>
+                <div class="bmi-category" id="bmiCategory">Unknown</div>
+                
+                <div class="bmi-gauge">
+                    <div class="bmi-gauge-fill" id="gaugeFill"></div>
+                </div>
+                
+                <div class="d-flex justify-content-between mt-2 text-muted" style="font-size: 0.75rem;">
+                    <span>18.5</span>
+                    <span>25</span>
+                    <span>30</span>
+                </div>
+                
+                <div class="alert mt-4 mb-0 py-2 small shadow-sm border-0" id="bmiMessage" role="alert"></div>
+            </div>
+
+            <div class="accordion accordion-flush mt-4" id="accordionInfo">
+                <div class="accordion-item bg-transparent">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button collapsed py-2 small bg-transparent shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                            <i class="fas fa-info-circle me-2 text-primary"></i> <span class="text-muted">Show Reference Table</span>
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionInfo">
+                        <div class="accordion-body p-0 pt-2">
+                            <table class="table table-sm table-bordered text-center mb-0 small" style="background: rgba(255,255,255,0.8);">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Category</th>
+                                        <th>BMI Range</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="table-primary text-primary"><td>Underweight</td><td>&lt; 18.5</td></tr>
+                                    <tr class="table-success text-success"><td>Normal</td><td>18.5 - 24.9</td></tr>
+                                    <tr class="table-warning text-warning"><td>Overweight</td><td>25 - 29.9</td></tr>
+                                    <tr class="table-danger text-danger"><td>Obese</td><td>&ge; 30</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Developer Footer -->
+    <div class="dev-footer">
+        Developed with <i class="fas fa-heart mx-1"></i> by <span class="dev-name">Ahmad Khan</span>
+    </div>
+</div>
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Three.js for 3D Background -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+
+<script src="script.js"></script>
+</body>
+</html>
