@@ -24,42 +24,76 @@
         </div>
         <div class="card-body p-4 p-md-5">
             
-            <div class="d-flex justify-content-center mb-4 unit-toggle">
-                <div class="btn-group" role="group" aria-label="Unit Toggle">
-                    <input type="radio" class="btn-check" name="unitSystem" id="metric" autocomplete="off" checked onchange="toggleUnits()">
-                    <label class="btn btn-outline-primary" for="metric">Metric (kg/cm)</label>
-
-                    <input type="radio" class="btn-check" name="unitSystem" id="imperial" autocomplete="off" onchange="toggleUnits()">
-                    <label class="btn btn-outline-primary" for="imperial">Imperial (lb/ft)</label>
-                </div>
-            </div>
-
             <form id="bmiForm" onsubmit="calculateBMI(event)">
+                
+                <!-- Age Calculation Section -->
+                <div class="row mb-4">
+                    <div class="col-6">
+                        <label for="dob" class="form-label">Date of Birth</label>
+                        <input type="date" class="form-control" id="dob" onchange="calculateAge()">
+                    </div>
+                    <div class="col-6">
+                        <label for="age" class="form-label">Age</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control bg-light" id="age" placeholder="0" readonly>
+                            <span class="input-group-text">Yrs</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weight Input Section -->
                 <div class="mb-4">
-                    <label for="weight" class="form-label">Weight</label>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label for="weight" class="form-label mb-0">Weight</label>
+                        <!-- Weight Unit Toggle -->
+                        <div class="btn-group section-toggle" role="group">
+                            <input type="radio" class="btn-check" name="weightUnit" id="weightKg" checked onclick="setWeightUnit('kg')">
+                            <label class="btn btn-outline-secondary" for="weightKg">KG</label>
+
+                            <input type="radio" class="btn-check" name="weightUnit" id="weightLbs" onclick="setWeightUnit('lbs')">
+                            <label class="btn btn-outline-secondary" for="weightLbs">LBS</label>
+                        </div>
+                    </div>
+                    
                     <div class="input-group input-group-lg">
                         <span class="input-group-text border-end-0 bg-transparent"><i class="fas fa-weight text-secondary"></i></span>
                         <input type="number" class="form-control border-start-0 ps-0" id="weight" placeholder="e.g. 70" required step="0.1" min="1">
-                        <span class="input-group-text" id="weightUnit">kg</span>
+                        <span class="input-group-text" id="weightUnitText">kg</span>
                     </div>
                 </div>
 
+                <!-- Height Input Section -->
                 <div class="mb-4">
-                    <label class="form-label">Height</label>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="form-label mb-0">Height</label>
+                        <!-- Height Unit Toggle -->
+                        <div class="btn-group section-toggle" role="group">
+                            <input type="radio" class="btn-check" name="heightUnit" id="heightCmOption" checked onclick="setHeightUnit('cm')">
+                            <label class="btn btn-outline-secondary" for="heightCmOption">CM</label>
+
+                            <input type="radio" class="btn-check" name="heightUnit" id="heightFtOption" onclick="setHeightUnit('ft')">
+                            <label class="btn btn-outline-secondary" for="heightFtOption">FT</label>
+                        </div>
+                    </div>
                     
+                    <!-- Metric Height (CM) -->
                     <div class="input-group input-group-lg" id="heightMetricGroup">
                         <span class="input-group-text border-end-0 bg-transparent"><i class="fas fa-ruler-vertical text-secondary"></i></span>
-                        <input type="number" class="form-control border-start-0 ps-0" id="heightCm" placeholder="e.g. 175" step="0.1" min="1">
+                        <input type="number" class="form-control border-start-0 ps-0" id="heightCm" placeholder="e.g. 175" step="0.1" min="1" oninput="updateHeightConversion()">
                         <span class="input-group-text">cm</span>
                     </div>
 
+                    <!-- Imperial Height (FT/IN) -->
                     <div class="input-group input-group-lg d-none" id="heightImperialGroup">
                         <span class="input-group-text border-end-0 bg-transparent"><i class="fas fa-ruler-vertical text-secondary"></i></span>
-                        <input type="number" class="form-control border-start-0 ps-0" id="heightFt" placeholder="ft" step="1" min="1">
+                        <input type="number" class="form-control border-start-0 ps-0" id="heightFt" placeholder="ft" step="1" min="1" oninput="updateHeightConversion()">
                         <span class="input-group-text">ft</span>
-                        <input type="number" class="form-control" id="heightIn" placeholder="in" step="1" min="0" max="11">
+                        <input type="number" class="form-control" id="heightIn" placeholder="in" step="1" min="0" max="11" oninput="updateHeightConversion()">
                         <span class="input-group-text">in</span>
                     </div>
+                    
+                    <!-- Height Helper Text for Conversion Check -->
+                    <div id="heightHelp" class="form-text text-end fst-italic mt-1" style="min-height: 20px; color: #667eea; font-weight: 500;"></div>
                 </div>
 
                 <div class="d-grid gap-2 mt-4">
@@ -88,6 +122,14 @@
                 </div>
                 
                 <div class="alert mt-4 mb-0 py-2 small shadow-sm border-0" id="bmiMessage" role="alert"></div>
+
+                <!-- NEW: Health Tips Section -->
+                <div id="healthTips" class="tips-container">
+                    <div class="tips-title"><i class="fas fa-lightbulb text-warning me-2"></i> Health Tips</div>
+                    <ul class="tips-list" id="tipsList">
+                        <!-- Dynamic tips will go here -->
+                    </ul>
+                </div>
             </div>
 
             <div class="accordion accordion-flush mt-4" id="accordionInfo">
@@ -132,8 +174,7 @@
 <!-- Three.js for 3D Background -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-
 <script src="script.js"></script>
-</body>
 
+</body>
 </html>
